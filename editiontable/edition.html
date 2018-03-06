@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>编辑表格</title>
+</head>
+<link rel="stylesheet" type="text/css" href="../bootstrap.min.css">
+<style type="text/css">
+	.table-striped{
+		width:800px;
+		margin: 0 auto;
+		text-align: center;
+	}
+	#delete{
+		width:50%;		
+		line-height: 10px;
+	}
+	#add{
+		width:50%;
+		
+		line-height: 10px
+	}
+	td input{
+		width:80%;
+		height: 100%;
+		text-align: center;
+		background-color: #ff0076;
+		border:none;
+		outline: none;
+	}
+</style>
+<body>
+     
+   <table class="table table-bordered table-striped">
+		<caption>可编辑 表格</caption>
+		  <thead>
+		    <tr>
+		      <th>name</th>
+		      <th>sex</th>
+		      <th>age</th>
+		      <th>编辑</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+		   <!--  <tr>
+		      <td></td>
+		      <td></td>
+		      <td></td>
+		      <td><button  id='delete' class='btn btn-danger btn-lg'>delete</button></td>
+		    </tr> -->
+
+
+		 </tbody>
+		 <tfoot>
+		  <tr><td><button id='add' class='btn btn-lg btn-warning'>add</button></td></tr>
+		 	
+		 </tfoot>	
+</table>
+     
+</body>
+</html>
+<script type="text/javascript"> 
+	var arr=[];
+    var nextid;
+	if(!localStorage.database){
+		
+	}else{
+	   arr=JSON.parse(localStorage.database);
+       // console.log(arr);  
+      
+       arr.forEach(function(value,index){
+          // console.log(index);//first is value   next is index 
+          let tr=document.createElement('tr');
+          tr.id=`${value.id}`;
+          
+		    document.querySelector('tbody').appendChild(tr);
+		     tr.innerHTML=`
+		      <td class='name'>${value.name}</td>
+		      <td class='sex'>${value.sex}</td>
+		      <td class='age'>${value.age}</td>
+		      <td><button  id='delete' class='btn btn-danger btn-lg'>delete</button></td>
+		    `
+       });
+       nextid=Number(arr[arr.length-1].id)+1;
+      
+	};
+	//delete  add edit --option   
+	// want delete
+	(function(){
+		let wantdelete=document.querySelector('tbody');
+		  wantdelete.addEventListener('click',dodelete);
+		  function dodelete(e){
+		  	    e.preventDefault();	
+		  	    if(e.target.id=='delete'){
+		  	    	let parent=e.target.parentNode.parentNode;		  	    
+                 // console.log(parent);
+                    wantdelete.removeChild(parent);
+                    // console.log(parent.id);
+                    // console.log(arr);
+                    var index=parent.id-1;
+                    arr.splice(index,1);
+                    localStorage.database=JSON.stringify(arr);
+                    
+		  	    }	  	    
+		  	    
+		  }
+	})();
+	//want delete --end
+	//want  add 
+	(function(){
+         let wantadd=document.querySelector('tfoot');
+         let tbody=document.querySelector('tbody');
+         wantadd.addEventListener('click',doadd);
+         function doadd(e){
+                e.preventDefault();
+             if(e.target.id=='add'){
+             	
+		    let tr=document.createElement('tr');
+		    
+               // console.log(inner);
+                tbody.appendChild(tr); 
+
+                tr.innerHTML=`
+              <td class='name'></td>
+		      <td class='sex'></td>
+		      <td calss='age'></td>
+		      <td><button  id='delete' class='btn btn-danger btn-lg'>delete</button></td>`
+               tr.id=nextid; 
+		       arr.push({"id":`${nextid}`,"name":'','sex':'','age':''});
+		       localStorage.database=JSON.stringify(arr);
+		       nextid++;
+             }   
+         }
+	})();
+	//want add --end--
+	//want edit 
+	(function(){
+		let edit=document.querySelector('tbody');
+		edit.addEventListener('click',doedit);
+		function doedit(e){
+			e.preventDefault();
+			let obj=e.target;
+			var parent=obj.parentNode.parentNode;
+
+			var classname=obj.classList.value;
+			// console.log(parent);
+			let value=obj.innerText;
+			if(obj.childNodes.length==1||obj.childNodes.length==0){
+				let input=document.createElement('input');
+				
+			// console.log(value);    //总是获取不到value
+				input.value=value;				                   
+				obj.innerHTML='';				
+				obj.appendChild(input);
+			    input.focus();
+
+			    // if(value){
+			    // 	// console.log(value);
+			    // };
+
+                obj.firstElementChild.onblur=function(){
+                	// let content=input.value;
+                	// console.log(e.target.parentNode.parentNode)
+                	if(input.value == null||input.value == value){
+					  obj.innerHTML = value;
+				    }else{
+					  obj.innerHTML = input.value;
+				    }
+                	
+                	console.log(obj);
+                    // var pid=arr.findIndex(function(d){
+                    // 	return d.id=obj.parentNode.id;
+                    // });
+                    var pid=obj.parentNode.id-1;
+                    arr.forEach((value,index)=>{
+                    	if(index==pid){
+                    		arr[index][classname]=obj.innerHTML;
+                    	}
+                    });
+                    localStorage.database=JSON.stringify(arr);
+                }
+			}
+		}
+	})();
+	//want edit --end
+</script>
+<script type="text/javascript">
+	// var data=[
+ //        {'id':0,'name':'wang','sex':'man','age':12},
+ //        {'id':1,'name':'lu','sex':'women','age':21},
+ //        {'id':1,'name':'haha','sex':'man','age':34}
+	// ];	
+	// localStorage.database=JSON.stringify(data);
+	
+     //database delete option
+      
+     //delete --end
+</script>
